@@ -170,13 +170,14 @@ def filter_img(df, min_gen=6, min_menu=6):
     filtered_df = pd.concat([filtered_df, main_images])
 
     main_images['type'] = 'PHOTO.S20.P1.IMG1'
-    filtered_df = pd.concat([filtered_df, main_images], ignore_index=True)
+    filtered_df = pd.concat([filtered_df, main_images])
 
     main_images['type'] = 'HOME.S1.P1.IMG1'
-    filtered_df = pd.concat([filtered_df, main_images], ignore_index=True)
+    filtered_df = pd.concat([filtered_df, main_images])
 
 
     print('Filter', filtered_df['code'].nunique())
+    print(f'Image types: {filtered_df["type"].unique()}')
     return filtered_df
 
 def check_img(img_df):
@@ -192,6 +193,15 @@ def check_img(img_df):
     for img_type in img_df['type'].unique():
         average_type = img_df[img_df['type'] == img_type].groupby('code')['type'].count().mean()
         print(f"Average number of {img_type} per code:", round(average_type))
+    print("Details of each type:")
+    print(img_df['type'].value_counts())
+
+
+def filter_review(df, min_reviews=5, min_len=10):
+    df = df[df['len'] >= min_len]
+    df = df.groupby('code').filter(lambda x: len(x) >= min_reviews)
+    return df
+
 
 def check_review(df):
     # Calculate the number of reviews for each code
