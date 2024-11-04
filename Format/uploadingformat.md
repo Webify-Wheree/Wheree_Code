@@ -8,7 +8,7 @@ This README provides an overview of the data entry requirements for brand inform
 - [Basic Information Entry](#basic-information-entry)
 - [Content Entry](#content-entry)
 - [Image Entry](#image-entry)
-- [Attribute Entry](#attribute-entry)
+- [Features Entry](#features-entry)
 - [Opening Hours Entry](#opening-hours-entry)
 
 ---
@@ -63,7 +63,7 @@ This README provides an overview of the data entry requirements for brand inform
 
 ---
 
-## Attribute Entry
+## Features Entry
 | STT | Field           | Description             | Required |
 |-----|-----------------|-------------------------|----------|
 | 1   | `code`          | Brand's unique code     | Yes      |
@@ -86,11 +86,3 @@ This README provides an overview of the data entry requirements for brand inform
 > **Note**: Either `openingHour` or `closingHour` must be specified for each entry.
 
 ---
-
-## Additional Notes
-- Ensure each brand entry adheres to the specified required fields.
-- For sub-page formats (content and images), use the format `MAIN.S1.P1.C1` for content and `MAIN.S1.P1.IMG1` for images to maintain organization.
-
----
-
-This README serves as a guide for entering and managing brand data within the system. Follow the above sections carefully to ensure consistency and accuracy in brand information entry.
