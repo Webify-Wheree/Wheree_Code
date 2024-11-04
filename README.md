@@ -1,10 +1,38 @@
-# Installation
-To set up the project, navigate to the project directory and install the required dependencies using the following commands:
+# Overview
+
+**Wheree_Code** is a Python-based project for automated web scraping, data processing, and affiliate link generation based on Google Maps data. It processes location-based data by filtering businesses in specific categories and cities, and it outputs insights including review details, affiliate links, and images.
+
+
+# Prerequisites
+Ensure the following packages and dependencies are installed:
+
+- Python 3.x
+- Packages from `requirements.txt`
+
+To install dependencies:
 
 ```bash
-cd 'path-to-project'
 pip install -r requirements.txt
 ```
+
+## Installation
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/Webify-Wheree/Wheree_Code.git
+   ```
+
+2. **Navigate to Project Directory**:
+   ```bash
+   cd Wheree_Code
+   ```
+
+3. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+
 # Stage 1
 ![image](https://github.com/user-attachments/assets/444289c0-e031-4162-8b87-c46e3e079663)
 
