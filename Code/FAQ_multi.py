@@ -3,11 +3,11 @@ import re
 import logging
 import os
 from bs4 import BeautifulSoup
-from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 import time
 import datetime
-from Utils import writeMainInfo, collectRecordsTobeChecked
+from Utils import writeMainInfo, collectRecordsTobeChecked, writeFile
 
 class FAQ:
     def __init__(self, source_path, success_path, failed_path, header, num_drivers):
@@ -66,6 +66,7 @@ class FAQ:
             soup = BeautifulSoup(page.content, "html.parser")
             question_elements = soup.find_all('div', class_='EkyQO')
             if question_elements:
+                results = []
                 question_ids = [element.get("data-question-id") for element in question_elements]
                 for question_id in question_ids:
                     faq_url = f'{url}/answers/{question_id}'
@@ -77,7 +78,10 @@ class FAQ:
                             'question': data_result[0],
                             'answer': data_result[i + 1],
                         }
-                        writeMainInfo(data_question, file_name=self.success_path)
+                        # writeMainInfo(data_question, file_name=self.success_path)
+                        results.append(data_question)
+                if results:
+                    writeFile(results, self.success_path)
             else:
                 writeMainInfo({'code': code, 'map_url': map_url, 'question': '', 'answer': ''}, file_name=self.failed_path)
         except Exception as e:
@@ -85,9 +89,7 @@ class FAQ:
             writeMainInfo({'code': code, 'map_url': map_url, 'question': '', 'answer': ''}, file_name=self.failed_path)
 
     def crawlMainTask(self):
-        start_time = time.time()
-        start_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        with ProcessPoolExecutor(max_workers=self.num_drivers) as executor:
+        with ThreadPoolExecutor(max_workers=self.num_drivers) as executor:
             futures = {executor.submit(self.process_url, entry): entry for entry in self.converted_urls}
             for future in tqdm(as_completed(futures), total=len(futures), desc="Processing URLs"):
                 try:
@@ -95,21 +97,27 @@ class FAQ:
                     
                 except Exception as e:
                     logging.error(f"Error in future: {e}")
-        end_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        duration = round((time.time() - start_time) / 3600, 2)
-        logging.info(f"Task started at: {start_date}")
-        logging.info(f"Task ended at: {end_date}")
-        logging.info(f"Crawling FAQ done in {duration} hours")
 
-# Example usage
-# source_path = r"D:\Wheree_Kiet\Sep\Output\Main\map_url_success_to_check.csv"
-source_path = r"D:\DATA\2024\Oct\Output\Main\11_10_2024_main_hour_(success).csv"
-base_dir = r"D:\DATA\2024\Oct\Output\FAQ"
-os.makedirs(base_dir, exist_ok=True)
-file_prefix = 'FAQ_'
-success_path = os.path.join(base_dir, f"{file_prefix}(success).csv")
-failed_path = os.path.join(base_dir, f"{file_prefix}(failed).csv")
-output_header = 'code,map_url,question,answer\n'
 
-crawler = FAQ(source_path, success_path, failed_path, output_header, num_drivers=100)
-crawler.crawlMainTask()
+if __name__ == "__main__":
+
+    start_time = time.time()
+    start_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    source_path = 'path-to-file-csv'
+    base_dir = 'path-to-results-folder'
+    os.makedirs(base_dir, exist_ok=True)
+    file_prefix = 'FAQ_'
+    success_path = os.path.join(base_dir, f"{file_prefix}(success).csv")
+    failed_path = os.path.join(base_dir, f"{file_prefix}(failed).csv")
+    output_header = 'code,map_url,question,answer\n'
+
+    crawler = FAQ(source_path, success_path, failed_path, output_header, num_drivers=100)
+    crawler.crawlMainTask()
+
+
+    end_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    duration = round((time.time() - start_time) / 3600, 2)
+    logging.info(f"Task started at: {start_date}")
+    logging.info(f"Task ended at: {end_date}")
+    logging.info(f"Crawling FAQ done in {duration} hours")
