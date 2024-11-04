@@ -10,6 +10,7 @@ from tqdm import tqdm
 from selenium.webdriver.common.action_chains import ActionChains
 from multiprocessing import Pool
 import re
+import pandas as pd
 
 class MainCrawler:
     def __init__(self, source_path, success_path, failed_path, success_path_aff, num_drivers, header):
@@ -19,7 +20,10 @@ class MainCrawler:
         self.source_path = source_path
         self.header = header
         self.processing_df = collectRecordsTobeChecked(self.success_path, self.failed_path, self.source_path, self.header)
+        temp = pd.read_csv(r"D:\DATA\2024\10_Oct\Combined\main.csv")
+        self.processing_df = self.processing_df[~self.processing_df['code'].isin(temp['code'])]
         self.processing_df = self.processing_df[['code','map_url','place_id']]
+        # self.processing_df = self.processing_df.head(5000)
         self.processing_df = self.processing_df[::-1]
 
 
@@ -228,12 +232,10 @@ class MainCrawler:
             num_image_element = driver.execute_script("return document.querySelector('button div.fontBodyMedium.YkuOqf');")
             
             num_image_text = driver.execute_script("return arguments[0].innerText;", num_image_element)
-            # num_image_text
             
             match = re.search(r'\d+', num_image_text)
             
             if match:
-                # num_image = int(match.group())
                 num_image = int(num_image_text.split(' ')[0].strip().replace(',', ''))
             else:
 
@@ -243,7 +245,7 @@ class MainCrawler:
 
         result_entry =  {
             "code": row['code'],
-            "orignalname": name, 
+            "original_name": name, 
             "englishname": englishname,
             "fulladdress": address,
             "price_levels": price,
@@ -251,8 +253,8 @@ class MainCrawler:
             "phone_code": phone_code,
             "rating": star_rating,
             "num_reviews": num_reviews,
-            'ordinatex': longlat.get('latitude'),
-            'ordinatey': longlat.get('longitude'),
+            'latitude': longlat.get('latitude'),
+            'longitude': longlat.get('longitude'),
             'emble': html,
             'map_url': row['map_url'],
             "hour": hour,
@@ -262,7 +264,7 @@ class MainCrawler:
             'place_id':row['place_id']
         }
 
-        if result_entry['emble'] is not None and result_entry['orignalname'] is not None and result_entry['fulladdress'] is not None and result_entry['rating'] is not None and result_entry['num_reviews'] is not None and result_entry['num_image'] > 5 and result_entry['hour'] != 'Closed':
+        if result_entry['emble'] is not None and result_entry['orignalname'] is not None and result_entry['fulladdress'] is not None and result_entry['rating'] is not None and result_entry['num_reviews'] is not None and result_entry['num_image'] >= 5 and result_entry['hour'] != 'Closed':
             writeMainInfo(result_entry, self.success_path)
             self.aff_link(driver, row)
         else:
@@ -288,16 +290,18 @@ class MainCrawler:
 
 if __name__ == '__main__':
     start_time = time.time()
-    source_path = r"\\Admin-pc\data\2024\11_Nov\Input\22-10-24_map_url_api_(processed).csv"
-    base_dir = r"D:\DATA\2024\11_Nov\Output"
-    file_prefix = "22_10_main_hour"
+    source_path = 'path-to-source-file-csv'
+    base_dir = 'path-to-results-folder'
+
+    
+    file_prefix = "main_hour"
     success_path = os.path.join(base_dir, f"{file_prefix}_(success).csv")
     failed_path = os.path.join(base_dir, f"{file_prefix}_(missing).csv")
 
     success_path_aff = os.path.join(base_dir, f"{file_prefix}_(aff).csv")
 
-    output_header = "code,orignalname,englishname,fulladdress,price_levels,phone,phone_code,rating,num_reviews,ordinatex,ordinatey,emble,map_url,hour,brand_type,about_status,num_image,place_id\n"
+    output_header = "code,original_name,englishname,fulladdress,price_levels,phone,phone_code,rating,num_reviews,latitude,longitude,emble,map_url,hour,brand_type,about_status,num_image,place_id\n"
 
-    crawler = MainCrawler(source_path, success_path, failed_path, success_path_aff, num_drivers = 60, header=output_header)
+    crawler = MainCrawler(source_path, success_path, failed_path, success_path_aff, num_drivers = 40, header=output_header)
     crawler.crawl()
     logging.info(f'Completed crawling MainExtract with {round((time.time() - start_time) / 3600,2)} hours.')
