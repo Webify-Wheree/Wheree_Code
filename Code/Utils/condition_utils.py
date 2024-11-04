@@ -163,6 +163,19 @@ def filter_img(df, min_gen=6, min_menu=6):
     # Filter the DataFrame to include only valid codes based on image count
     filtered_df = df[df['code'].isin(valid_codes)].copy()
 
+    main_images = filtered_df[filtered_df['type'] == 'MAIN']  
+    main_images = main_images.drop_duplicates(subset=['code'], keep='first')
+
+    filtered_df = filtered_df[filtered_df['type'] != 'MAIN']
+    filtered_df = pd.concat([filtered_df, main_images])
+
+    main_images['type'] = 'PHOTO.S20.P1.IMG1'
+    filtered_df = pd.concat([filtered_df, main_images], ignore_index=True)
+
+    main_images['type'] = 'HOME.S1.P1.IMG1'
+    filtered_df = pd.concat([filtered_df, main_images], ignore_index=True)
+
+
     print('Filter', filtered_df['code'].nunique())
     return filtered_df
 
