@@ -59,7 +59,7 @@ This README provides an overview of the data entry requirements for brand inform
 |-----|-----------|-------------------------------------------|----------|
 | 1   | `code`    | Brand's unique code                       | Yes      |
 | 2   | `image`   | Link to the image                         | Yes      |
-| 3   | `type`    | Image type: `MENU` (menu image), `IMAGE` (gallery), `MAIN` (primary image). For sub-pages, use format e.g., `MAIN.S1.P1.IMG1` | Yes      |
+| 3   | `type`    | Image type: `MENU` (menu image), `IMAGE` (gallery), `MAIN` (primary image).| Yes      |
 
 ---
 
